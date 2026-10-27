@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Виноградный доктор</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#2f6b3a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prata&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
@@ -92,6 +96,12 @@ thead th { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; 
 .disease p { margin: 0; }
 .product { display: grid; gap: 2px; }
 .product .shops { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: .88rem; }
+.chip { display: inline-block; font-size: .72rem; font-weight: 600; letter-spacing: .02em; padding: 1px 8px; border-radius: 999px; vertical-align: 2px; }
+.chip.ok { background: var(--vitriol-soft); color: var(--vitriol); }
+.chip.unk { background: var(--warn-soft); color: var(--warn); }
+.product .desc { font-size: .9rem; color: var(--muted); }
+.disease .hint { font-size: .82rem; color: var(--muted); }
+.disease .important { padding: 10px 12px; border-radius: 10px; background: var(--warn-soft); font-size: .92rem; }
 a { color: var(--vitriol); }
 .disclaimer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; margin: 0; }
 
@@ -166,7 +176,7 @@ footer { font-size: .82rem; color: var(--muted); }
 
 <script src="ort.wasm.min.js"></script>
 <script>
-const DATA = {"diseases": {"healthy": {"title": "Здоровый лист", "about": "Признаков болезни не найдено.", "treatment": ["Лечение не нужно.", "Профилактика: проветриваемый куст (обломка лишних побегов, подвязка), убирать опавшие листья, не поливать по листьям."], "timing": ["Профилактические обработки обычно делают: по распускающимся почкам, перед цветением, после цветения и при ягодах размером с горошину."], "products": []}, "downy_mildew": {"title": "Милдью (ложная мучнистая роса)", "about": "Маслянистые жёлтые пятна сверху листа, белый пушок снизу. Развивается в тёплую дождливую погоду.", "treatment": ["Сразу удалить и вынести с участка сильно поражённые листья.", "Обработать системным препаратом, через 10–14 дней — повторить (лучше препаратом с другим действующим веществом).", "Контактные медные препараты — для профилактики и после дождей."], "timing": ["Опрыскивать в сухую безветренную погоду, утром или вечером.", "Если после обработки прошёл сильный дождь — контактный препарат смыт, нужно повторить.", "Перед сбором урожая соблюдать срок ожидания, указанный на упаковке."], "products": [["Ридомил Голд", "металаксил-М + манкоцеб, системный"], ["Профит Голд", "цимоксанил + фамоксадон"], ["Ордан", "цимоксанил + хлорокись меди"], ["Бордоская смесь", "медь, контактный, профилактика"]]}, "oidium": {"title": "Оидиум (мучнистая роса)", "about": "Серо-белый мучнистый налёт на листьях и ягодах, ягоды могут трескаться. Любит жару и сухость с высокой влажностью воздуха.", "treatment": ["Удалить поражённые грозди и побеги, проредить куст.", "Обработать серным или системным препаратом, повторить через 10–14 дней.", "Чередовать препараты разных групп, чтобы не было привыкания."], "timing": ["Сера работает примерно при +20…+30 °C: в холод слабо действует, в сильную жару может обжечь листья.", "Не опрыскивать в жаркий полдень и в цветение (если на упаковке не разрешено).", "Перед сбором урожая соблюдать срок ожидания с упаковки."], "products": [["Тиовит Джет", "сера, контактный"], ["Топаз", "пенконазол, системный"], ["Скор", "дифеноконазол, системный"], ["Строби", "крезоксим-метил"]]}}, "shops": {"Ozon": "https://www.ozon.ru/search/?text={q}", "Яндекс Маркет": "https://market.yandex.ru/search?text={q}", "Wildberries": "https://www.wildberries.ru/catalog/0/search.aspx?search={q}"}, "disclaimer": "⚠️ Дозировку, кратность и срок ожидания до сбора урожая смотри на упаковке препарата. Работай в перчатках и маске. Модель может ошибаться — при сомнениях покажи лист специалисту."};
+const DATA = {"diseases": {"healthy": {"title": "Здоровый лист", "about": "Признаков болезни не найдено.", "treatment": ["Лечение не нужно.", "Профилактика: проветриваемый куст (обломка лишних побегов, подвязка), убирать опавшие листья, не поливать по листьям."], "timing": ["Профилактические обработки обычно делают: по распускающимся почкам, перед цветением, после цветения и при ягодах размером с горошину."], "products": [], "note": ""}, "downy_mildew": {"title": "Милдью (ложная мучнистая роса)", "about": "Маслянистые жёлтые пятна сверху листа, белый пушок снизу. Развивается в тёплую дождливую погоду.", "treatment": ["Сразу удалить и вынести с участка сильно поражённые листья.", "Обработать системным препаратом, через 10–14 дней — повторить (лучше препаратом с другим действующим веществом).", "Контактные медные препараты — для профилактики и после дождей."], "timing": ["Опрыскивать в сухую безветренную погоду, утром или вечером.", "Если после обработки прошёл сильный дождь — контактный препарат смыт, нужно повторить.", "Перед сбором урожая соблюдать срок ожидания, указанный на упаковке."], "products": [["Профит Голд", "фамоксадон + цимоксанил; 4 г на 10 л воды, до 3 обработок, срок ожидания 30 дней", "да"], ["Ридомил Голд МЦ", "металаксил-М + манкоцеб, системный", "не проверено"], ["Ордан", "цимоксанил + хлорокись меди", "не проверено"], ["Бордоская смесь", "медь, контактный; по регламенту — ранневесеннее опрыскивание до распускания почек", "не проверено"]], "note": ""}, "oidium": {"title": "Оидиум (мучнистая роса)", "about": "Серо-белый мучнистый налёт на листьях и ягодах, ягоды могут трескаться. Любит жару и сухость с высокой влажностью воздуха.", "treatment": ["Удалить поражённые грозди и побеги, проредить куст.", "Обработать серным препаратом, повторить через 10–14 дней.", "Чередовать препараты разных групп, чтобы не было привыкания."], "timing": ["Сера работает примерно при +20…+30 °C: в холод слабо действует, в сильную жару может обжечь листья.", "Не опрыскивать в жаркий полдень и в цветение (если на упаковке не разрешено).", "Перед сбором урожая соблюдать срок ожидания с упаковки."], "products": [["Тиовит Джет", "сера, контактный", "да"]], "note": "Топаз и Скор на винограде зарегистрированы только для сельхозпредприятий, в личных подсобных хозяйствах их применять на винограде нельзя. Строби для винограда сейчас не зарегистрирован."}}, "shops": {"Ozon": "https://www.ozon.ru/search/?text={q}", "Яндекс Маркет": "https://market.yandex.ru/search?text={q}", "Wildberries": "https://www.wildberries.ru/catalog/0/search.aspx?search={q}"}, "disclaimer": "⚠️ Дозировку, кратность и срок ожидания до сбора урожая смотри на упаковке препарата. Работай в перчатках и маске. Модель может ошибаться — при сомнениях покажи лист специалисту.", "lph_hint": "«Для ЛПХ» — препарат разрешён в личных подсобных хозяйствах (на даче). Данные сверены с открытыми справочниками в октябре 2026 г.; перед покупкой проверьте на упаковке пометку «для ЛПХ» и культуру «виноград»."};
 const KEY_MAP = { downy_mildew: "downy_mildew", powdery_mildew: "oidium", healthy: "healthy" };
 const LABELS = { downy_mildew: "Милдью", powdery_mildew: "Оидиум", healthy: "Здоровый лист" };
 const CONFIDENCE_THRESHOLD = 60;   // как в app.py
@@ -293,16 +303,19 @@ function diseaseCard(cls, pct) {
   if (d.products.length) {
     card.append(el("h4", {}, "Препараты и где купить"));
     const list = el("div", { class: "advice" });
-    for (const [name, desc] of d.products) {
+    for (const [name, desc, lph] of d.products) {
       const shops = el("div", { class: "shops" });
       for (const [shop, url] of Object.entries(DATA.shops)) {
         shops.append(el("a", { href: url.replace("{q}", encodeURIComponent(name)), target: "_blank", rel: "noopener" }, shop));
       }
       const b = el("strong", {}, name);
-      list.append(el("div", { class: "product" }, el("div", {}, b, " — " + desc), shops));
+      const chip = el("span", { class: "chip " + (lph === "да" ? "ok" : "unk") }, lph === "да" ? "для ЛПХ" : "ЛПХ: не проверено");
+      list.append(el("div", { class: "product" }, el("div", {}, b, " ", chip), el("div", { class: "desc" }, desc), shops));
     }
     card.append(list);
+    card.append(el("p", { class: "hint" }, DATA.lph_hint));
   }
+  if (d.note) card.append(el("p", { class: "important" }, el("strong", {}, "Важно: "), d.note));
   return card;
 }
 
@@ -365,9 +378,20 @@ async function onFile(ev) {
   }
 }
 
+// Работа без интернета: сохраняем страницу и модель в телефоне (на сайте GitHub)
+async function setupOffline() {
+  if (!("serviceWorker" in navigator) || !(location.protocol === "https:" || location.hostname === "localhost")) return;
+  try {
+    await navigator.serviceWorker.register("sw.js");
+    await navigator.serviceWorker.ready;
+    const ok = await caches.has("grape-doctor-v1");
+    if (ok) $("footer").insertAdjacentHTML("afterbegin", "<strong>Сохранено в телефоне — работает без интернета.</strong> ");
+  } catch (_) { /* внутри Claude это не работает, и это нормально */ }
+}
+
 $("inCamera").addEventListener("change", onFile);
 $("inFile").addEventListener("change", onFile);
-init();
+init().then(setupOffline);
 </script>
 
 </body>
