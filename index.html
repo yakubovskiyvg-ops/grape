@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Виноградный доктор</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prata&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one narrow column, like a field notebook page; the photo and the verdict sit on top, advice below. */
+:root {
+  --bg: #f2f5ef;          /* pale leaf underside */
+  --surface: #ffffff;
+  --ink: #18261c;         /* deep vine */
+  --muted: #5b6b5f;
+  --line: #d5ddd2;
+  --vine: #2f6b3a;        /* healthy leaf green */
+  --vitriol: #1d6fa5;     /* copper-sulphate blue, the colour of a sprayed vineyard */
+  --vitriol-soft: #e3eef6;
+  --warn: #9a5b10;
+  --warn-soft: #f8ecd9;
+  --danger: #a3332b;
+  --font-display: "Prata", "Georgia", serif;
+  --font-body: "Golos Text", "Segoe UI", system-ui, sans-serif;
+  --font-data: "JetBrains Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1913; --surface: #16231b; --ink: #e4ece4; --muted: #9aab9e; --line: #2a3a2f;
+    --vine: #7cc28a; --vitriol: #5fa9dd; --vitriol-soft: #14293a;
+    --warn: #e2a85a; --warn-soft: #2e2416; --danger: #ef8a80; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1913; --surface: #16231b; --ink: #e4ece4; --muted: #9aab9e; --line: #2a3a2f;
+  --vine: #7cc28a; --vitriol: #5fa9dd; --vitriol-soft: #14293a;
+  --warn: #e2a85a; --warn-soft: #2e2416; --danger: #ef8a80; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 400 1rem/1.55 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px;
+}
+.wrap { max-width: 40rem; margin: 0 auto; display: grid; gap: 20px; }
+header h1 { font: 400 2rem/1.15 var(--font-display); margin: 0; text-wrap: balance; }
+header p { margin: 6px 0 0; color: var(--muted); }
+.eyebrow { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--vine); font-weight: 600; }
+
+.shoot { display: grid; gap: 12px; padding: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn {
+  flex: 1 1 10rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 52px; padding: 0 18px; border-radius: 12px; cursor: pointer;
+  font: 600 1rem var(--font-body); border: 1.5px solid var(--vitriol);
+  background: var(--vitriol); color: #fff;
+}
+.btn.secondary { background: transparent; color: var(--vitriol); }
+.btn:focus-visible { outline: 3px solid var(--vitriol); outline-offset: 2px; }
+.btn:disabled { opacity: .5; cursor: progress; }
+.btn input { display: none; }
+.status { font-size: .9rem; color: var(--muted); min-height: 1.4em; }
+.status.error { color: var(--danger); }
+
+.photo { display: grid; grid-template-columns: 7rem 1fr; gap: 14px; align-items: start; }
+.photo img { width: 7rem; height: 7rem; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); }
+.verdict h2 { font: 400 1.5rem/1.2 var(--font-display); margin: 2px 0 6px; text-wrap: balance; }
+.verdict .note { margin: 0; color: var(--muted); font-size: .92rem; }
+.bars { display: grid; gap: 6px; margin-top: 10px; }
+.bar { display: grid; grid-template-columns: 1fr 3.2rem; gap: 8px; align-items: center; font-size: .85rem; }
+.bar .track { grid-column: 1 / -1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar .fill { height: 100%; background: var(--vine); border-radius: 3px; }
+.bar .pct { font-family: var(--font-data); text-align: right; font-variant-numeric: tabular-nums; }
+.bar.top .fill { background: var(--vitriol); }
+
+.callout { padding: 14px 16px; border-radius: 12px; background: var(--warn-soft); border-left: 4px solid var(--warn); }
+.callout h3 { margin: 0 0 8px; font-size: 1.05rem; }
+.table-scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; min-width: 28rem; }
+th, td { text-align: left; vertical-align: top; padding: 7px 8px; border-bottom: 1px solid var(--line); }
+thead th { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+.advice { display: grid; gap: 14px; }
+.disease { padding: 18px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; display: grid; gap: 10px; }
+.disease h3 { font: 400 1.35rem/1.2 var(--font-display); margin: 0; }
+.disease h4 { margin: 6px 0 0; font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--vine); }
+.disease ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.disease p { margin: 0; }
+.product { display: grid; gap: 2px; }
+.product .shops { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: .88rem; }
+a { color: var(--vitriol); }
+.disclaimer { font-size: .85rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; margin: 0; }
+
+.guide { display: grid; gap: 10px; }
+.guide dl { margin: 0; display: grid; gap: 10px; }
+.guide dt { font-weight: 600; }
+.guide dd { margin: 0; color: var(--muted); }
+footer { font-size: .82rem; color: var(--muted); }
+@media (max-width: 420px) { .photo { grid-template-columns: 5rem 1fr; } .photo img { width: 5rem; height: 5rem; } }
+@media (prefers-reduced-motion: no-preference) { .fill { transition: width .4s ease; } }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Лист винограда · 3 диагноза</div>
+    <h1>Виноградный доктор</h1>
+    <p>Сфотографируйте больной лист: программа подскажет, милдью это, оидиум или лист здоров, и чем лечить. Фото не отправляется в интернет, распознавание идёт прямо в телефоне.</p>
+  </header>
+
+  <section class="shoot" aria-label="Фото листа">
+    <div class="buttons">
+      <label class="btn" id="btnCamera"><input id="inCamera" type="file" accept="image/*" capture="environment">Сфотографировать</label>
+      <label class="btn secondary" id="btnFile"><input id="inFile" type="file" accept="image/*">Выбрать фото</label>
+    </div>
+    <div class="status" id="status" role="status">Загружаем модель…</div>
+  </section>
+
+  <section id="result" hidden aria-live="polite">
+    <div class="photo">
+      <img id="preview" alt="Ваше фото листа">
+      <div class="verdict">
+        <div class="eyebrow" id="vEyebrow">Диагноз</div>
+        <h2 id="vTitle"></h2>
+        <p class="note" id="vNote"></p>
+        <div class="bars" id="bars"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="confusion" class="callout" hidden>
+    <h3>Милдью или оидиум? Проверьте сами</h3>
+    <p>По одному фото эти болезни бывает трудно различить. Осмотрите больной лист с обеих сторон:</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th></th><th>Милдью</th><th>Оидиум</th></tr></thead>
+        <tbody>
+          <tr><th>Верх листа</th><td>жёлтые «маслянистые» пятна, позже буреют</td><td>серо-белый мучнистый налёт</td></tr>
+          <tr><th>Низ листа</th><td>белый пушок только снизу, под пятнами</td><td>налёта снизу обычно мало</td></tr>
+          <tr><th>Провести пальцем</th><td>пушок почти не стирается</td><td>налёт стирается, как мука</td></tr>
+          <tr><th>Ягоды</th><td>буреют, сморщиваются</td><td>в налёте, трескаются</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Чтобы ответ был точнее, сфотографируйте отдельно верх и низ листа.</p>
+  </section>
+
+  <section class="advice" id="advice" hidden></section>
+
+  <section class="guide" id="guide">
+    <div class="eyebrow">Как снимать</div>
+    <dl>
+      <dt>Один лист крупным планом</dt><dd>Лист занимает почти весь кадр, без гроздей и неба.</dd>
+      <dt>Дневной свет</dt><dd>Без вспышки и без резкого солнца в кадре.</dd>
+      <dt>Обе стороны листа</dt><dd>У милдью белый пушок бывает только снизу, у оидиума налёт обычно сверху.</dd>
+    </dl>
+  </section>
+
+  <footer id="footer">Модель различает: милдью, оидиум, здоровый лист. Другие болезни (серая гниль, антракноз и т.д.) она пока не знает и может принять их за одну из этих трёх.</footer>
+</div>
+
+<script src="ort.wasm.min.js"></script>
+<script>
+const DATA = {"diseases": {"healthy": {"title": "Здоровый лист", "about": "Признаков болезни не найдено.", "treatment": ["Лечение не нужно.", "Профилактика: проветриваемый куст (обломка лишних побегов, подвязка), убирать опавшие листья, не поливать по листьям."], "timing": ["Профилактические обработки обычно делают: по распускающимся почкам, перед цветением, после цветения и при ягодах размером с горошину."], "products": []}, "downy_mildew": {"title": "Милдью (ложная мучнистая роса)", "about": "Маслянистые жёлтые пятна сверху листа, белый пушок снизу. Развивается в тёплую дождливую погоду.", "treatment": ["Сразу удалить и вынести с участка сильно поражённые листья.", "Обработать системным препаратом, через 10–14 дней — повторить (лучше препаратом с другим действующим веществом).", "Контактные медные препараты — для профилактики и после дождей."], "timing": ["Опрыскивать в сухую безветренную погоду, утром или вечером.", "Если после обработки прошёл сильный дождь — контактный препарат смыт, нужно повторить.", "Перед сбором урожая соблюдать срок ожидания, указанный на упаковке."], "products": [["Ридомил Голд", "металаксил-М + манкоцеб, системный"], ["Профит Голд", "цимоксанил + фамоксадон"], ["Ордан", "цимоксанил + хлорокись меди"], ["Бордоская смесь", "медь, контактный, профилактика"]]}, "oidium": {"title": "Оидиум (мучнистая роса)", "about": "Серо-белый мучнистый налёт на листьях и ягодах, ягоды могут трескаться. Любит жару и сухость с высокой влажностью воздуха.", "treatment": ["Удалить поражённые грозди и побеги, проредить куст.", "Обработать серным или системным препаратом, повторить через 10–14 дней.", "Чередовать препараты разных групп, чтобы не было привыкания."], "timing": ["Сера работает примерно при +20…+30 °C: в холод слабо действует, в сильную жару может обжечь листья.", "Не опрыскивать в жаркий полдень и в цветение (если на упаковке не разрешено).", "Перед сбором урожая соблюдать срок ожидания с упаковки."], "products": [["Тиовит Джет", "сера, контактный"], ["Топаз", "пенконазол, системный"], ["Скор", "дифеноконазол, системный"], ["Строби", "крезоксим-метил"]]}}, "shops": {"Ozon": "https://www.ozon.ru/search/?text={q}", "Яндекс Маркет": "https://market.yandex.ru/search?text={q}", "Wildberries": "https://www.wildberries.ru/catalog/0/search.aspx?search={q}"}, "disclaimer": "⚠️ Дозировку, кратность и срок ожидания до сбора урожая смотри на упаковке препарата. Работай в перчатках и маске. Модель может ошибаться — при сомнениях покажи лист специалисту."};
+const KEY_MAP = { downy_mildew: "downy_mildew", powdery_mildew: "oidium", healthy: "healthy" };
+const LABELS = { downy_mildew: "Милдью", powdery_mildew: "Оидиум", healthy: "Здоровый лист" };
+const CONFIDENCE_THRESHOLD = 60;   // как в app.py
+const CONFUSION_THRESHOLD = 20;
+const MEAN = [0.485, 0.456, 0.406], STD = [0.229, 0.224, 0.225];
+
+const $ = (id) => document.getElementById(id);
+let session = null, info = null;
+
+function setStatus(text, isError) {
+  const s = $("status"); s.textContent = text; s.classList.toggle("error", !!isError);
+}
+function setBusy(busy) {
+  for (const id of ["inCamera", "inFile"]) $(id).disabled = busy;
+}
+
+async function init() {
+  setBusy(true);
+  try {
+    if (!window.ort) throw new Error("не загрузился движок ort.wasm.min.js");
+    // Файлы движка лежат рядом со страницей
+    ort.env.wasm.wasmPaths = new URL("./", location.href).href;
+    ort.env.wasm.numThreads = 1;
+    const r = await fetch("model_info.json");
+    if (!r.ok) throw new Error("не найден файл model_info.json");
+    info = await r.json();
+    let modelSource = info.model;
+    if (info.parts_b64 && info.parts_b64.length) {
+      // Модель лежит частями в виде текста (base64) — скачиваем и раскодируем
+      const total = info.bytes || 0;
+      const buf = new Uint8Array(total);
+      let offset = 0, n = 0;
+      for (const part of info.parts_b64) {
+        setStatus(`Загружаем модель… часть ${++n} из ${info.parts_b64.length} (всего ${(total / 1e6).toFixed(0)} МБ)`);
+        const resp = await fetch(part);
+        if (!resp.ok) throw new Error("не найден файл " + part);
+        const bin = atob((await resp.text()).trim());
+        for (let i = 0; i < bin.length; i++) buf[offset + i] = bin.charCodeAt(i);
+        offset += bin.length;
+      }
+      if (total && offset !== total) throw new Error("модель скачалась не полностью");
+      modelSource = buf;
+    } else if (info.parts && info.parts.length) {
+      // Модель лежит двумя частями — скачиваем и склеиваем
+      const total = info.bytes || 0;
+      const buf = new Uint8Array(total);
+      let offset = 0;
+      for (const part of info.parts) {
+        const resp = await fetch(part);
+        if (!resp.ok) throw new Error("не найден файл " + part);
+        const reader = resp.body.getReader();
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf.set(value, offset); offset += value.length;
+          if (total) setStatus(`Загружаем модель… ${Math.round(offset / total * 100)}% из ${(total / 1e6).toFixed(0)} МБ`);
+        }
+      }
+      if (total && offset !== total) throw new Error("модель скачалась не полностью");
+      modelSource = buf;
+    }
+    setStatus("Запускаем модель…");
+    session = await ort.InferenceSession.create(modelSource, { executionProviders: ["wasm"] });
+    setStatus("Готово. Сфотографируйте лист или выберите фото из галереи.");
+  } catch (e) {
+    setStatus("Не удалось загрузить модель: " + (e && e.message ? e.message : e) + ". Проверьте интернет и обновите страницу.", true);
+    return;
+  } finally {
+    setBusy(!session);
+  }
+}
+
+async function loadBitmap(file) {
+  if (window.createImageBitmap) {
+    try { return await createImageBitmap(file, { imageOrientation: "from-image" }); } catch (_) {}
+  }
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  await new Promise((ok, bad) => { img.onload = ok; img.onerror = () => bad(new Error("не удалось открыть фото")); img.src = url; });
+  return img;
+}
+
+// Уменьшаем фото до 224x224 поэтапно (так меньше «лесенки», ближе к Python)
+function toTensor(bitmap, size) {
+  let w = bitmap.width, h = bitmap.height, src = bitmap;
+  while (w / 2 > size || h / 2 > size) {
+    const c = document.createElement("canvas");
+    c.width = Math.max(size, Math.round(w / 2)); c.height = Math.max(size, Math.round(h / 2));
+    const cx = c.getContext("2d"); cx.imageSmoothingQuality = "high";
+    cx.drawImage(src, 0, 0, c.width, c.height);
+    src = c; w = c.width; h = c.height;
+  }
+  const c = document.createElement("canvas"); c.width = size; c.height = size;
+  const cx = c.getContext("2d"); cx.imageSmoothingQuality = "high";
+  cx.drawImage(src, 0, 0, size, size);
+  const px = cx.getImageData(0, 0, size, size).data;
+  const area = size * size, arr = new Float32Array(3 * area);
+  for (let i = 0; i < area; i++) {
+    for (let ch = 0; ch < 3; ch++) arr[ch * area + i] = (px[i * 4 + ch] / 255 - MEAN[ch]) / STD[ch];
+  }
+  return new ort.Tensor("float32", arr, [1, 3, size, size]);
+}
+
+function softmax(a) {
+  const m = Math.max(...a), e = a.map((x) => Math.exp(x - m)), s = e.reduce((p, q) => p + q, 0);
+  return e.map((x) => x / s);
+}
+
+function el(tag, attrs, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) n.setAttribute(k, v);
+  for (const k of kids) n.append(k);
+  return n;
+}
+
+function diseaseCard(cls, pct) {
+  const d = DATA.diseases[KEY_MAP[cls]];
+  const card = el("article", { class: "disease" });
+  card.append(el("h3", {}, d.title));
+  if (pct != null) card.append(el("p", { class: "note" }, `Уверенность модели: ${Math.round(pct)}%`));
+  card.append(el("p", {}, d.about));
+  card.append(el("h4", {}, "Что делать"), el("ul", {}, ...d.treatment.map((t) => el("li", {}, t))));
+  card.append(el("h4", {}, "Когда обрабатывать"), el("ul", {}, ...d.timing.map((t) => el("li", {}, t))));
+  if (d.products.length) {
+    card.append(el("h4", {}, "Препараты и где купить"));
+    const list = el("div", { class: "advice" });
+    for (const [name, desc] of d.products) {
+      const shops = el("div", { class: "shops" });
+      for (const [shop, url] of Object.entries(DATA.shops)) {
+        shops.append(el("a", { href: url.replace("{q}", encodeURIComponent(name)), target: "_blank", rel: "noopener" }, shop));
+      }
+      const b = el("strong", {}, name);
+      list.append(el("div", { class: "product" }, el("div", {}, b, " — " + desc), shops));
+    }
+    card.append(list);
+  }
+  return card;
+}
+
+function show(probs) {
+  const classes = info.classes;
+  const pct = {}; classes.forEach((c, i) => (pct[c] = probs[i] * 100));
+  const order = classes.slice().sort((a, b) => pct[b] - pct[a]);
+  const top = order[0], conf = pct[top];
+  const downy = pct.downy_mildew || 0, powdery = pct.powdery_mildew || 0;
+
+  const bars = $("bars"); bars.textContent = "";
+  for (const c of order) {
+    const fill = el("div", { class: "fill" }); fill.style.width = pct[c].toFixed(1) + "%";
+    bars.append(el("div", { class: "bar" + (c === top ? " top" : "") },
+      el("span", {}, LABELS[c] || c), el("span", { class: "pct" }, Math.round(pct[c]) + "%"),
+      el("div", { class: "track" }, fill)));
+  }
+
+  const advice = $("advice"); advice.textContent = "";
+  $("confusion").hidden = true;
+  if (downy >= CONFUSION_THRESHOLD && powdery >= CONFUSION_THRESHOLD) {
+    $("vEyebrow").textContent = "Нужна ваша проверка";
+    $("vTitle").textContent = "Милдью или оидиум";
+    $("vNote").textContent = `Милдью ${Math.round(downy)}%, оидиум ${Math.round(powdery)}%. Сравните лист с подсказкой ниже.`;
+    $("confusion").hidden = false;
+    advice.append(diseaseCard("downy_mildew", downy), diseaseCard("powdery_mildew", powdery));
+  } else if (conf >= CONFIDENCE_THRESHOLD) {
+    $("vEyebrow").textContent = "Диагноз";
+    $("vTitle").textContent = LABELS[top] || top;
+    $("vNote").textContent = `Уверенность ${Math.round(conf)}%. Результат ориентировочный и не заменяет консультацию агронома.`;
+    advice.append(diseaseCard(top, conf));
+  } else {
+    $("vEyebrow").textContent = "Не уверен";
+    $("vTitle").textContent = "Нужно другое фото";
+    $("vNote").textContent = `Лучший вариант: ${LABELS[top] || top}, ${Math.round(conf)}%. Сфотографируйте один лист крупным планом при дневном свете.`;
+  }
+  advice.append(el("p", { class: "disclaimer" }, DATA.disclaimer));
+  advice.hidden = false;
+  $("result").hidden = false;
+  $("result").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function onFile(ev) {
+  const file = ev.target.files && ev.target.files[0];
+  ev.target.value = "";
+  if (!file || !session) return;
+  setBusy(true); setStatus("Смотрю на лист…");
+  try {
+    $("preview").src = URL.createObjectURL(file);
+    const bmp = await loadBitmap(file);
+    const t0 = performance.now();
+    const out = await session.run({ input: toTensor(bmp, info.img_size || 224) });
+    const logits = Array.from(out[session.outputNames[0]].data);
+    show(softmax(logits));
+    setStatus(`Готово за ${((performance.now() - t0) / 1000).toFixed(1)} с. Можно сфотографировать ещё один лист.`);
+  } catch (e) {
+    setStatus("Не получилось обработать фото: " + e.message + ". Попробуйте другое фото.", true);
+  } finally {
+    setBusy(false);
+  }
+}
+
+$("inCamera").addEventListener("change", onFile);
+$("inFile").addEventListener("change", onFile);
+init();
+</script>
+
+</body>
+</html>

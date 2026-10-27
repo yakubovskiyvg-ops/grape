@@ -1,0 +1,14 @@
+{
+  "model": "grape_model.onnx",
+  "classes": [
+    "downy_mildew",
+    "healthy",
+    "powdery_mildew"
+  ],
+  "img_size": 224,
+  "parts": [
+    "grape_model.part1",
+    "grape_model.part2"
+  ],
+  "bytes": 16035557
+}
