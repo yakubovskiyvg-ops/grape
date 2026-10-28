@@ -58,6 +58,7 @@ body {
   padding-block: 20px 40px;
 }
 .wrap { max-width: 40rem; margin: 0 auto; display: grid; gap: 20px; }
+.wrap > * { min-width: 0; }   /* широкие таблицы прокручиваются внутри, а не раздвигают страницу */
 header.hero {
   position: relative; overflow: hidden; isolation: isolate;
   padding: 22px 18px 20px; border-radius: 18px; border: 1px solid var(--line);
@@ -105,6 +106,7 @@ header p { margin: 6px 0 0; color: var(--muted); }
 .callout h3 { margin: 0 0 8px; font-size: 1.05rem; }
 .table-scroll { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-size: .9rem; min-width: 28rem; }
+@media (max-width: 480px) { .callout table { min-width: 0; font-size: .82rem; } .callout th, .callout td { padding: 6px 5px; } .callout { padding: 12px 12px; } }
 th, td { text-align: left; vertical-align: top; padding: 7px 8px; border-bottom: 1px solid var(--line); }
 thead th { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 
@@ -273,6 +275,24 @@ footer { font-size: .82rem; color: var(--muted); }
     </div>
   </section>
 
+  <section id="confusion3" class="callout" hidden>
+    <h3>Чёрная гниль или войлочный клещ? Проверьте сами</h3>
+    <p>На фото бурые пятна чёрной гнили бывают похожи на рыжий войлок зудня. Осмотрите лист с обеих сторон и потрогайте пятно:</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th></th><th>Чёрная гниль</th><th>Войлочный клещ (зудень)</th></tr></thead>
+        <tbody>
+          <tr><th>Верх листа</th><td>плоские округлые пятна: светло-бурые, с тёмной каймой</td><td>вздутия-бугорки, лист как в пузырях; бугорки зелёные или желтоватые</td></tr>
+          <tr><th>Внутри пятна</th><td>мелкие чёрные точки (видно с лупой или на крупном фото)</td><td>чёрных точек нет</td></tr>
+          <tr><th>Низ листа</th><td>пятно просвечивает, войлока нет</td><td>плотный войлок во впадинах под бугорками: сначала белый, потом рыжий или бурый</td></tr>
+          <tr><th>На ощупь</th><td>ткань в пятне сухая, отмершая</td><td>лист живой, войлок мягкий, как бархат</td></tr>
+          <tr><th>Ягоды</th><td>буреют, чернеют и засыхают в твёрдые «мумии»</td><td>обычно не трогает</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Чтобы ответ был точнее, сфотографируйте отдельно верх и низ листа.</p>
+  </section>
+
   <section class="advice" id="advice" hidden></section>
 
   <details class="journal" id="history">
@@ -352,7 +372,7 @@ const KEY_MAP = { downy_mildew: "downy_mildew", powdery_mildew: "oidium", health
 const LABELS = { downy_mildew: "Милдью", powdery_mildew: "Оидиум", healthy: "Здоровый лист", erinose_mite: "Войлочный клещ", black_rot: "Чёрная гниль", anthracnose: "Антракноз", chlorosis: "Хлороз", other: "Не лист винограда" };
 const CONFIDENCE_THRESHOLD = 60;   // как в app.py
 const CONFUSION_THRESHOLD = 20;
-const CACHE_NAME = "grape-doctor-v2";   // должно совпадать с CACHE в sw.js
+const CACHE_NAME = "grape-doctor-v4";   // должно совпадать с CACHE в sw.js
 const MEAN = [0.485, 0.456, 0.406], STD = [0.229, 0.224, 0.225];
 
 const $ = (id) => document.getElementById(id);
@@ -528,6 +548,7 @@ function show(probs) {
   const order = classes.slice().sort((a, b) => pct[b] - pct[a]);
   const top = order[0], conf = pct[top];
   const downy = pct.downy_mildew || 0, powdery = pct.powdery_mildew || 0, erinose = pct.erinose_mite || 0;
+  const blackRot = pct.black_rot || 0;
 
   const bars = $("bars"); bars.textContent = "";
   for (const c of order) {
@@ -538,7 +559,7 @@ function show(probs) {
   }
 
   const advice = $("advice"); advice.textContent = "";
-  $("confusion").hidden = true; $("confusion2").hidden = true;
+  $("confusion").hidden = true; $("confusion2").hidden = true; $("confusion3").hidden = true;
   if (top === "other" && conf >= CONFIDENCE_THRESHOLD) {
     // Ближайший вариант среди болезней винограда — на случай, если модель ошиблась
     const alt = order.find((c) => c !== "other");
@@ -547,6 +568,12 @@ function show(probs) {
     $("vEyebrow").textContent = "Не виноград?";
     $("vTitle").textContent = "Похоже, это не лист винограда";
     $("vNote").textContent = `Уверенность ${Math.round(conf)}%.${altText} Сфотографируйте один лист винограда крупным планом при дневном свете, чтобы он занимал почти весь кадр.`;
+  } else if (blackRot >= CONFUSION_THRESHOLD && erinose >= CONFUSION_THRESHOLD) {
+    $("vEyebrow").textContent = "Нужна ваша проверка";
+    $("vTitle").textContent = "Чёрная гниль или войлочный клещ";
+    $("vNote").textContent = `Чёрная гниль ${Math.round(blackRot)}%, войлочный клещ ${Math.round(erinose)}%. Сравните лист с подсказкой ниже.`;
+    $("confusion3").hidden = false;
+    advice.append(diseaseCard("black_rot", blackRot), diseaseCard("erinose_mite", erinose));
   } else if (downy >= CONFUSION_THRESHOLD && erinose >= CONFUSION_THRESHOLD) {
     $("vEyebrow").textContent = "Нужна ваша проверка";
     $("vTitle").textContent = "Милдью или войлочный клещ";
