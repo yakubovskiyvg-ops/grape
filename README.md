@@ -49,3 +49,5 @@
 - **Niphad Grape Leaf Disease Dataset (NGLD)** — M. Dharrao, D. Dharrao, R. Sonawane, Mendeley Data, 2025, [doi:10.17632/8nnd2ypcv3.2](https://doi.org/10.17632/8nnd2ypcv3.2), лицензия [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 - Фотографии из открытых источников в интернете — использованы только для обучения модели; сами фото здесь не выкладываются.
 - Погода: [Weather data by Open-Meteo.com](https://open-meteo.com/), лицензия [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+- **PlantVillage** — фото чёрной гнили, [github.com/spMohanty/PlantVillage-Dataset](https://github.com/spMohanty/PlantVillage-Dataset), лицензия CC BY-SA 3.0.
+- **iNaturalist** — фото наблюдателей со свободными лицензиями (CC0, CC BY, CC BY-NC и др.); авторы и ссылки перечислены в файле `credits_inat_v9.csv`.
