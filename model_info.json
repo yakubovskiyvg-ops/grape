@@ -1,8 +1,11 @@
 {
   "model": "grape_model.onnx",
   "classes": [
+    "chlorosis",
     "downy_mildew",
+    "erinose_mite",
     "healthy",
+    "other",
     "powdery_mildew"
   ],
   "img_size": 224,
@@ -10,5 +13,5 @@
     "grape_model.part1",
     "grape_model.part2"
   ],
-  "bytes": 16035557
+  "bytes": 16050931
 }
