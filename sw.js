@@ -1,6 +1,6 @@
 // Сохраняет страницу и модель в телефоне, чтобы всё работало без интернета.
 // При обновлении модели или страницы увеличь номер версии ниже.
-const CACHE = "grape-doctor-v2";
+const CACHE = "grape-doctor-v3";
 const FILES = [
   "./", "index.html", "model_info.json", "manifest.webmanifest",
   "grape_model.part1", "grape_model.part2",

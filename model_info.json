@@ -1,6 +1,7 @@
 {
   "model": "grape_model.onnx",
   "classes": [
+    "black_rot",
     "chlorosis",
     "downy_mildew",
     "erinose_mite",
@@ -13,5 +14,5 @@
     "grape_model.part1",
     "grape_model.part2"
   ],
-  "bytes": 16050931
+  "bytes": 16056055
 }
