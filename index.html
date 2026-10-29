@@ -372,7 +372,7 @@ const KEY_MAP = { downy_mildew: "downy_mildew", powdery_mildew: "oidium", health
 const LABELS = { downy_mildew: "Милдью", powdery_mildew: "Оидиум", healthy: "Здоровый лист", erinose_mite: "Войлочный клещ", black_rot: "Чёрная гниль", anthracnose: "Антракноз", chlorosis: "Хлороз", other: "Не лист винограда" };
 const CONFIDENCE_THRESHOLD = 60;   // как в app.py
 const CONFUSION_THRESHOLD = 20;
-const CACHE_NAME = "grape-doctor-v5";   // должно совпадать с CACHE в sw.js
+const CACHE_NAME = "grape-doctor-v6";   // должно совпадать с CACHE в sw.js
 const MEAN = [0.485, 0.456, 0.406], STD = [0.229, 0.224, 0.225];
 
 const $ = (id) => document.getElementById(id);
@@ -598,7 +598,7 @@ function show(probs) {
   }
   if (top !== "other") {
     // На проверке v9 модель уверенно принимала за виноград похожие листья: клён, инжир, кабачок, томат
-    advice.append(el("p", { class: "disclaimer" }, "Модель знает только виноград. Листья, похожие на виноградные (клён, инжир, кабачок, тыква, огурец), она может принять за больной лист винограда — тогда ответ не подходит."));
+    advice.append(el("p", { class: "disclaimer" }, "Модель знает только виноград. Листья, похожие на виноградные (девичий виноград, клён, инжир, кабачок, тыква, огурец), она может принять за больной лист винограда — тогда ответ не подходит."));
   }
   advice.append(el("p", { class: "disclaimer" }, DATA.disclaimer));
   advice.hidden = false;
@@ -747,7 +747,7 @@ function calcRender() {
   const lo = c.min * l / 10, hi = c.max * l / 10;
   const out = $("calcOut"); out.textContent = "";
   out.append(el("div", { class: "big" }, l ? (lo === hi ? `${f(lo)} г` : `${f(lo)}–${f(hi)} г`) : "—"),
-    el("p", {}, `на ${f(l)} л воды (норма ${c.min === c.max ? c.min : c.min + "–" + c.max} г на 10 л)`),
+    el("p", {}, (l ? `на ${f(l)} л воды` : "Введите, сколько литров воды") + ` (норма ${c.min === c.max ? c.min : c.min + "–" + c.max} г на 10 л)`),
     el("p", {}, c.note));
 }
 $("calcProd").addEventListener("change", calcRender);
@@ -788,7 +788,8 @@ async function wxLoad(place) {
     if (mean[i] >= 20 && tmax[i] <= 32) oid++;
   }
   const month = new Date().getMonth() + 1;
-  if (month >= 11 || month <= 3) out.append(el("div", { class: "risk low" }, "Сейчас не сезон: у винограда нет листьев, болезни на листьях не развиваются. Прогноз станет полезен весной."));
+  // Зимой (ноябрь–март) — только пометка «не сезон», без оценки риска (иначе «не сезон» и «риск высокий» спорят друг с другом)
+  if (month >= 11 || month <= 3) { out.append(el("div", { class: "risk low" }, "Сейчас не сезон: у винограда нет листьев, болезни на листьях не развиваются. Прогноз станет полезен весной.")); return; }
   const downy = heavy ? ["high", "Милдью: риск высокий — ожидается сильный дождь (от 10 мм) в тёплую погоду. Через 5–7 дней после таких дождей осмотрите листья снизу; профилактическую обработку лучше сделать до дождя."]
     : wetWarm >= 2 ? ["mid", "Милдью: риск средний — несколько тёплых дождливых дней. Осматривайте листья."]
     : ["low", "Милдью: риск низкий — сильных тёплых дождей в прогнозе нет."];
@@ -807,6 +808,8 @@ $("wxFind").addEventListener("click", async () => {
     wxLoad({ name: [g.name, g.admin1, g.country].filter(Boolean).join(", "), lat: g.latitude, lon: g.longitude });
   } catch (_) { wxMsg("Не удалось найти место. Проверьте интернет."); }
 });
+// Кнопка «Ввод» на клавиатуре телефона в поле города тоже запускает поиск
+$("wxCity").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); $("wxFind").click(); } });
 $("wxGeo").addEventListener("click", () => {
   if (!navigator.geolocation) { wxMsg("Телефон не дал определить место — введите город вручную."); return; }
   wxMsg("Определяем место…");
