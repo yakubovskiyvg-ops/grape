@@ -372,7 +372,7 @@ const KEY_MAP = { downy_mildew: "downy_mildew", powdery_mildew: "oidium", health
 const LABELS = { downy_mildew: "Милдью", powdery_mildew: "Оидиум", healthy: "Здоровый лист", erinose_mite: "Войлочный клещ", black_rot: "Чёрная гниль", anthracnose: "Антракноз", chlorosis: "Хлороз", other: "Не лист винограда" };
 const CONFIDENCE_THRESHOLD = 60;   // как в app.py
 const CONFUSION_THRESHOLD = 20;
-const CACHE_NAME = "grape-doctor-v4";   // должно совпадать с CACHE в sw.js
+const CACHE_NAME = "grape-doctor-v5";   // должно совпадать с CACHE в sw.js
 const MEAN = [0.485, 0.456, 0.406], STD = [0.229, 0.224, 0.225];
 
 const $ = (id) => document.getElementById(id);
@@ -595,6 +595,10 @@ function show(probs) {
     $("vEyebrow").textContent = "Не уверен";
     $("vTitle").textContent = "Нужно другое фото";
     $("vNote").textContent = `Лучший вариант: ${LABELS[top] || top}, ${Math.round(conf)}%. Сфотографируйте один лист крупным планом при дневном свете.`;
+  }
+  if (top !== "other") {
+    // На проверке v9 модель уверенно принимала за виноград похожие листья: клён, инжир, кабачок, томат
+    advice.append(el("p", { class: "disclaimer" }, "Модель знает только виноград. Листья, похожие на виноградные (клён, инжир, кабачок, тыква, огурец), она может принять за больной лист винограда — тогда ответ не подходит."));
   }
   advice.append(el("p", { class: "disclaimer" }, DATA.disclaimer));
   advice.hidden = false;
